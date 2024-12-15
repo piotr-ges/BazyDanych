@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Mieszkaniec
+from .models import Mieszkaniec, Licznik
 
-# Register your models here.
 admin.site.register(Mieszkaniec)
+admin.site.register(Licznik)
+
