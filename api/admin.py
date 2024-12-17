@@ -1,6 +1,9 @@
 from django.contrib import admin
-from .models import Mieszkaniec, Licznik
+from . import models
 
-admin.site.register(Mieszkaniec)
-admin.site.register(Licznik)
-
+admin.site.register(models.Mieszkaniec)
+admin.site.register(models.Licznik)
+admin.site.register(models.Harmonogram)
+admin.site.register(models.Rozliczenie)
+admin.site.register(models.Usterka)
+admin.site.register(models.Uchwala)

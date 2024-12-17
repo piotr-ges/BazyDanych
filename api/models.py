@@ -5,14 +5,12 @@ from django.contrib.auth.models import AbstractUser
 
 # Model Mieszkaniec
 class Mieszkaniec(AbstractUser):
-    imie = models.CharField(max_length=50)
-    nazwisko = models.CharField(max_length=50)
     adres = models.CharField(max_length=255)
     telefon = models.CharField(max_length=15, null=True)
     email = models.EmailField(unique=True, null=True)
 
     def __str__(self):
-        return f"{self.imie} {self.nazwisko}"
+        return f"{self.first_name} {self.last_name}"
 
 # Model Licznik
 class Licznik(models.Model):
