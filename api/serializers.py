@@ -1,6 +1,6 @@
-from django.contrib.auth.models import User
 from rest_framework import serializers
 from .models import Mieszkaniec, Licznik, Rozliczenie, Usterka, Uchwala
+from rest_framework.authtoken.views import Token
 
 
 class MieszkaniecSerializer(serializers.ModelSerializer):
@@ -11,6 +11,7 @@ class MieszkaniecSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = Mieszkaniec.objects.create_user(**validated_data)
+        Token.objects.create(user=user)
         return user
 
 class LicznikSerializer(serializers.ModelSerializer):
@@ -32,7 +33,6 @@ class UchwalaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Uchwala
         fields = ["id", "tytul", "opis", "data_przyjecia"]
-
 
 
 

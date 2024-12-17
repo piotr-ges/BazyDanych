@@ -10,7 +10,7 @@ class Mieszkaniec(AbstractUser):
     email = models.EmailField(unique=True, null=True)
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        return f"{self.first_name} {self.last_name} {self.username}"
 
 # Model Licznik
 class Licznik(models.Model):
