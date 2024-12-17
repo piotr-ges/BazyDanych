@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 asgiref
 Django
 django-cors-headers
@@ -7,4 +8,15 @@ PyJWT
 pytz
 sqlparse
 psycopg2-binary
+=======
+asgiref
+Django
+django-cors-headers
+djangorestframework
+djangorestframework-simplejwt
+PyJWT
+pytz
+sqlparse
+psycopg2-binary
+>>>>>>> origin/master
 python-dotenv
