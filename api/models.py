@@ -55,7 +55,9 @@ class Uchwala(models.Model):
 class Harmonogram(models.Model):
     tytul = models.CharField(max_length=255)
     data_spotkania = models.DateField()
+    czas_spotkania = models.TimeField()
     opis = models.TextField(blank=True, null=True)
+    uczestnicy = models.ManyToManyField(Mieszkaniec, related_name="spotkania")
 
     def __str__(self):
         return f"Spotkanie: {self.tytul} ({self.data_spotkania})"

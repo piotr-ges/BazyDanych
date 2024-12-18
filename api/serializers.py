@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Mieszkaniec, Licznik, Rozliczenie, Usterka, Uchwala
+from .models import Mieszkaniec, Licznik, Rozliczenie, Usterka, Uchwala, Harmonogram
 from rest_framework.authtoken.views import Token
 
 
@@ -33,6 +33,38 @@ class UchwalaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Uchwala
         fields = ["id", "tytul", "opis", "data_przyjecia"]
+
+class DaneKontaktoweSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Mieszkaniec
+        fields = ["email", "telefon"]
+
+class LoginSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Mieszkaniec
+        fields = ["username", "password"]
+
+class MieszkaniecSpotkanieSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Mieszkaniec
+        fields = ['id', 'first_name', 'last_name']
+
+class HarmonogramSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Harmonogram
+        fields = ['id', 'tytul', 'data_spotkania', 'czas_spotkania']
+
+class HarmonogramDetailSerializer(serializers.ModelSerializer):
+    uczestnicy = MieszkaniecSpotkanieSerializer(many=True)
+    class Meta:
+        model = Harmonogram
+        fields = ['id', 'tytul', 'opis', 'data_spotkania', 'czas_spotkania', 'uczestnicy']
+
+class HarmonogramCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Harmonogram
+        fields = ['tytul', 'opis', 'data_spotkania', 'czas_spotkania']
+
 
 
 
