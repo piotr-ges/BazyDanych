@@ -10,9 +10,29 @@ class MieszkaniecSerializer(serializers.ModelSerializer):
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data):
-        user = Mieszkaniec.objects.create_user(**validated_data)
+        user = Mieszkaniec(
+            username=validated_data['username'],
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
+            adres=validated_data['adres'],
+            telefon=validated_data['telefon'],
+            email=validated_data['email']
+        )
+        password = validated_data.get('password')
+        if password:
+            user.set_password(password)
+        user.save()
         Token.objects.create(user=user)
         return user
+
+    def update(self, instance, validated_data):
+        password = validated_data.pop('password', None)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        if password:
+            instance.set_password(password)
+        instance.save()
+        return instance
 
 class LicznikSerializer(serializers.ModelSerializer):
     class Meta:
@@ -22,13 +42,29 @@ class LicznikSerializer(serializers.ModelSerializer):
 class RozliczenieSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rozliczenie
-        fields = ["id", "mieszkaniec", "kwota", "data_rozliczenia", "opis"]
+        fields = ["id", "mieszkaniec", "kwota", "data_rozliczenia", "opis", "status"]
 
 class UsterkaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usterka
         fields = ['id', 'mieszkaniec', 'opis', 'status']
-        read_only_fields = ['mieszkaniec']
+
+    def get_fields(self):
+        fields = super().get_fields()
+        request = self.context.get('request', None)
+        if request and request.user.is_staff:
+            fields['status'].read_only = False
+        else:
+            fields['status'].read_only = True
+        fields['mieszkaniec'].read_only = True
+        return fields
+
+    def validate(self, data):
+        try:
+            return super().validate(data)
+        except serializers.ValidationError as e:
+            print(f"Validation error: {e}")
+            raise
 
 class UchwalaSerializer(serializers.ModelSerializer):
     class Meta:

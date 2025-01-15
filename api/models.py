@@ -24,13 +24,20 @@ class Licznik(models.Model):
 
 # Model Rozliczenie
 class Rozliczenie(models.Model):
+    STATUS_CHOICES = [
+        ('oczekujące', 'Oczekujące'),
+        ('zrealizowane', 'Zrealizowane'),
+        ('anulowane', 'Anulowane'),
+    ]
+
     mieszkaniec = models.ForeignKey(Mieszkaniec, on_delete=models.CASCADE, related_name="rozliczenia")
     kwota = models.DecimalField(max_digits=10, decimal_places=2)
     data_rozliczenia = models.DateField()
     opis = models.TextField(blank=True)
+    status = models.CharField(max_length=12, choices=STATUS_CHOICES, default='oczekujące')
 
     def __str__(self):
-        return f"Rozliczenie {self.kwota} PLN dla {self.mieszkaniec}"
+        return f"Rozliczenie {self.kwota} PLN dla {self.mieszkaniec} - Status: {self.get_status_display()}"
 
 # Model Usterka
 class Usterka(models.Model):

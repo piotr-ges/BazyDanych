@@ -16,4 +16,6 @@ urlpatterns = [
     path('usterki/admin/', views.UsterkaAdminView.as_view(), name='usterki-admin-list'),
     path('usterki/admin/<int:pk>/', views.UsterkaAdminView.as_view(), name='usterki-admin-detail'),
     path('user-info/', views.getUserInfo, name='user-info'),  # Add this line
+    path('login/', views.login, name='login'),
+    path('stworz-mieszkanca/', views.CreateMieszkaniecView.as_view(), name='create_mieszkaniec'),
 ]

@@ -14,6 +14,7 @@ from rest_framework.response import Response
 from .models import Mieszkaniec, Uchwala, Harmonogram, Usterka, Licznik, Rozliczenie
 from .serializers import MieszkaniecSerializer, UchwalaSerializer, HarmonogramSerializer, UsterkaSerializer, LicznikSerializer, RozliczenieSerializer
 from .permissions import IsAdminOrReadOnly
+from django.contrib.auth import authenticate
 
 
 class CreateMieszkaniecView(generics.CreateAPIView):
@@ -34,7 +35,7 @@ class MieszkaniecViewSet(viewsets.ModelViewSet):
     """
     Zarządza mieszkańcami.
     - Odczyt: Dostęp dla wszystkich uwierzytelnionych użytkowników.
-    - Edycja: Dostęp tylko dla administratorów (superuserów).
+    - Edycja: Dostęp tylko dla administratorów (superuserów) i właścicieli kont.
     """
     queryset = Mieszkaniec.objects.all()
     serializer_class = MieszkaniecSerializer
@@ -47,6 +48,33 @@ class MieszkaniecViewSet(viewsets.ModelViewSet):
             return Mieszkaniec.objects.all()
         return Mieszkaniec.objects.filter(id=user.id)
 
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update']:
+            self.permission_classes = [IsAuthenticated]
+        else:
+            self.permission_classes = [IsAuthenticated, IsAdminOrReadOnly]
+        return super().get_permissions()
+
+    def perform_update(self, serializer):
+        if not self.request.user.is_staff and self.request.user != serializer.instance:
+            raise PermissionDenied("You can only update your own data.")
+        password = serializer.validated_data.get('password', None)
+        if password:
+            serializer.instance.set_password(password)
+        serializer.save()
+
+@api_view(['POST'])
+def login(request):
+    """
+    Loguje użytkownika i zwraca token.
+    """
+    username = request.data.get('username')
+    password = request.data.get('password')
+    user = authenticate(username=username, password=password)
+    if user:
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({'token': token.key})
+    return Response({'error': 'Invalid Credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 class UchwalaViewSet(viewsets.ModelViewSet):
     """
@@ -58,6 +86,8 @@ class UchwalaViewSet(viewsets.ModelViewSet):
     serializer_class = UchwalaSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = [IsAuthenticated, IsAdminOrReadOnly]
+
+
 class UsterkaListCreateView(generics.ListCreateAPIView):
     """
     Zarządza usterkami.
@@ -77,7 +107,12 @@ class UsterkaListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         if self.request.user.is_staff:
             raise PermissionDenied("Admins cannot create new issues.")
-        serializer.save(mieszkaniec=self.request.user, status='nowa')
+        try:
+            print(f"Creating usterka with data: {serializer.validated_data}")
+            serializer.save(mieszkaniec=self.request.user, status='nowa')
+        except Exception as e:
+            print(f"Error creating usterka: {e}")
+            raise
 
 
 class UsterkaAdminView(generics.RetrieveUpdateAPIView):
@@ -93,7 +128,13 @@ class UsterkaAdminView(generics.RetrieveUpdateAPIView):
     def perform_update(self, serializer):
         if not self.request.user.is_staff:
             raise PermissionDenied("Only admins can update issues.")
-        serializer.save(partial=True)
+        try:
+            print(f"Updating usterka with data: {serializer.validated_data}")
+            serializer.save()
+            print(f"Updated usterka: {serializer.instance}")
+        except Exception as e:
+            print(f"Error updating usterka: {e}")
+            raise
 
 
 class LicznikViewSet(viewsets.ModelViewSet):
