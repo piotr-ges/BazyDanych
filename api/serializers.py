@@ -27,7 +27,8 @@ class RozliczenieSerializer(serializers.ModelSerializer):
 class UsterkaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usterka
-        fields = ['id', 'mieszkaniec', 'opis', 'status', 'data_zgloszenia']
+        fields = ['id', 'mieszkaniec', 'opis', 'status']
+        read_only_fields = ['mieszkaniec']
 
 class UchwalaSerializer(serializers.ModelSerializer):
     class Meta:

@@ -20,11 +20,10 @@ from api.views import CreateMieszkaniecView
 from rest_framework.authtoken.views import obtain_auth_token
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
-
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/user/register/", CreateMieszkaniecView.as_view(), name="register"),
-    path('auth/', obtain_auth_token),
+    path('api/auth/', obtain_auth_token),
     path("api/", include("api.urls")),
 
     # URL-e dla dokumentacji Swagger i Redoc

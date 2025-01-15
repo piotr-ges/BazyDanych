@@ -40,7 +40,7 @@ class Usterka(models.Model):
     data_zgloszenia = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return f"Usterka: {self.opis[:30]} ({self.status})"
+        return self.opis
 
 # Model Uchwała
 class Uchwala(models.Model):
